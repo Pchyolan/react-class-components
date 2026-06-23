@@ -1,4 +1,4 @@
-import { Component, type ChangeEvent } from 'react'
+import { type ChangeEvent } from 'react'
 import './Search.css'
 
 type SearchProps = {
@@ -7,29 +7,27 @@ type SearchProps = {
     onSearch: () => void
 }
 
-class Search extends Component<SearchProps> {
-    handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-        this.props.onSearchChange(event.target.value)
+function Search({ search, onSearchChange, onSearch }: SearchProps) {
+    const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+        onSearchChange(event.target.value)
     }
 
-    render() {
-        return (
-            <section className="search-panel">
-                <input
-                    className="search-input"
-                    value={this.props.search}
-                    onChange={this.handleChange}
-                    placeholder="Search character..."
-                />
+    return (
+        <section className="search-panel">
+            <input
+                className="search-input"
+                value={search}
+                onChange={handleChange}
+                placeholder="Search character..."
+            />
 
-                <button
-                    className="primary-button"
-                    onClick={this.props.onSearch}>
-                    Search
-                </button>
-            </section>
-        )
-    }
+            <button
+                className="primary-button"
+                onClick={onSearch}>
+                Search
+            </button>
+        </section>
+    )
 }
 
 export default Search
