@@ -1,4 +1,4 @@
-import { Component } from 'react'
+import { useEffect, useState } from 'react'
 import Search from './Search'
 import Results from './Results'
 import ErrorBoundary from './ErrorBoundary'
@@ -12,52 +12,36 @@ type Person = {
   height: string
 }
 
-type AppState = {
-  characters: Person[]
-  search: string
-  lastSearch: string
-  loading: boolean
-  error: string | null
-}
+function App() {
 
-class App extends Component<object, AppState> {
 
-  state: AppState = {
-    characters: [],
-    search: '',
-    lastSearch: '',
-    loading: false,
-    error: null,
-  }
+  const [characters, setCharacters] = useState<Person[]>([]);
+  const [search, setSearch] = useState('');
+  const [lastSearch, setLastSearch] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null)
 
-  componentDidMount(): void {
+  useEffect(() => {
     const savedSearch = localStorage.getItem('search')
 
     if (savedSearch) {
-      this.setState({
-        search: savedSearch,
-        lastSearch: savedSearch,
-      },
-        () => {
-          this.loadCharacters()
-        })
+      setSearch(savedSearch)
+      setLastSearch(savedSearch)
+      loadCharacters(savedSearch)
     } else {
-      this.loadCharacters()
+      loadCharacters('')
     }
-  }
+  }, [])
 
-  loadCharacters = async () => {
+  const loadCharacters = async (searchValue: string) => {
     try {
+      setLoading(true)
+      setError(null)
 
-      this.setState({
-        loading: true,
-        error: null,
-      })
+      const trimmedSearch = searchValue.trim()
 
-      const search = this.state.search.trim()
-
-      const url = search
-        ? `https://swapi.online/api/people?search=${search}` : 'https://swapi.online/api/characters'
+      const url = trimmedSearch
+        ? `https://swapi.online/api/people?search=${trimmedSearch}` : 'https://swapi.online/api/characters'
       const response = await fetch(url)
 
       if (!response.ok) {
@@ -66,85 +50,72 @@ class App extends Component<object, AppState> {
 
       const data: Person[] = await response.json()
 
-      this.setState({
-        characters: data,
-        loading: false,
-        error: null,
-      })
+      setCharacters(data)
+      setLoading(false)
+      setError(null)
+
     } catch {
-      this.setState({
-        characters: [],
-        loading: false,
-        error: 'Failed to load characters',
-      })
+      setCharacters([])
+      setLoading(false)
+      setError('Failed to load characters')
     }
   }
 
-  handleSearchChange = (value: string) => {
-    this.setState({
-      search: value,
-    })
+  const handleSearchChange = (value: string) => {
+    setSearch(value)
   }
 
-  handleSearch = () => {
-    const trimmedSearch = this.state.search.trim()
+  const handleSearch = () => {
+    const trimmedSearch = search.trim()
 
-    if (this.state.lastSearch === trimmedSearch) {
+    if (lastSearch === trimmedSearch) {
       return
     }
 
     localStorage.setItem('search', trimmedSearch)
 
-    this.setState({
-      search: trimmedSearch,
-      lastSearch: trimmedSearch,
-    }, () => {
-      this.loadCharacters()
-    }
-    )
+
+    setSearch(trimmedSearch)
+    setLastSearch(trimmedSearch)
+    loadCharacters(trimmedSearch)
+
   }
 
-  deleteCharacter = (id: number) => {
-    const fileredCharacters = this.state.characters.filter(
+  const deleteCharacter = (id: number) => {
+    const filteredCharacters = characters.filter(
       (character) => character.id !== id
     )
-
-    this.setState({
-      characters: fileredCharacters
-    })
+    setCharacters(filteredCharacters)
   }
 
+  return (
+    <main className='app'>
+      <header className="app-header">
+        <p className="app-kicker">A long time ago in a galaxy far, far away...</p>
+        <h1>Star Wars Characters</h1>
+      </header>
 
-  render() {
-    return (
-      <main className='app'>
-        <header className="app-header">
-          <p className="app-kicker">A long time ago in a galaxy far, far away...</p>
-          <h1>Star Wars Characters</h1>
-        </header>
+      <section className='search-section'>
+        <Search
+          search={search}
+          onSearchChange={handleSearchChange}
+          onSearch={handleSearch}
+        />
+      </section>
 
-        <section className='search-section'>
-          <Search
-            search={this.state.search}
-            onSearchChange={this.handleSearchChange}
-            onSearch={this.handleSearch}
+      <section className='results-section'>
+        <ErrorBoundary>
+          <Results
+            characters={characters}
+            onDelete={deleteCharacter}
+            loading={loading}
+            error={error}
           />
-        </section>
+        </ErrorBoundary>
+      </section>
 
-        <section className='results-section'>
-          <ErrorBoundary>
-            <Results
-              characters={this.state.characters}
-              onDelete={this.deleteCharacter}
-              loading={this.state.loading}
-              error={this.state.error}
-            />
-          </ErrorBoundary>
-        </section>
-
-      </main>
-    )
-  }
+    </main>
+  )
 }
 
 export default App
