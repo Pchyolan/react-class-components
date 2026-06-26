@@ -2,12 +2,21 @@ import { cleanup, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import App from './App';
 import userEvent from '@testing-library/user-event';
+import { MemoryRouter } from 'react-router-dom'
 
 afterEach(() => {
     cleanup();
     localStorage.clear();
     vi.restoreAllMocks();
 });
+
+const renderApp = () => {
+    return render(
+        <MemoryRouter>
+            <App />
+        </MemoryRouter>
+    )
+}
 
 describe('App', () => {
 
@@ -24,7 +33,7 @@ describe('App', () => {
                 },
             ]
         })
-        render(<App />);
+        renderApp()
         expect(await screen.findByText('Luke')).toBeInTheDocument();
         expect(await screen.findByText('Gender: male, Birth Year: 19BBY, Height: 172')).toBeInTheDocument();
     });
@@ -34,7 +43,7 @@ describe('App', () => {
             ok: false,
         });
 
-        render(<App />);
+        renderApp()
         expect(await screen.findByText('Failed to load characters')).toBeInTheDocument();
     });
 
@@ -44,7 +53,7 @@ describe('App', () => {
             json: async () => [],
         })
 
-        render(<App />);
+        renderApp()
         expect(await screen.findByText('No results found in this galaxy..')).toBeInTheDocument();
     });
 
@@ -69,7 +78,7 @@ describe('App', () => {
             ]
         });
 
-        render(<App />);
+        renderApp()
 
         expect(await screen.findByText('Luke')).toBeInTheDocument();
         expect(await screen.findByText('Vader')).toBeInTheDocument();
@@ -109,7 +118,7 @@ describe('App', () => {
                 ]
             })
 
-        render(<App />)
+        renderApp()
 
         expect(await screen.findByText('Luke')).toBeInTheDocument();
 
@@ -154,7 +163,7 @@ describe('App', () => {
                 ]
             })
 
-        render(<App />);
+        renderApp()
 
         const user = userEvent.setup();
         const searchBtn = screen.getByRole('button', { name: /search/i });
@@ -185,7 +194,7 @@ describe('App', () => {
             ]
         })
 
-        render(<App />);
+        renderApp()
 
         expect(screen.getByDisplayValue('Vader')).toBeInTheDocument();
         expect(globalThis.fetch).toHaveBeenCalledWith('https://swapi.online/api/people?search=Vader')
@@ -209,11 +218,11 @@ describe('App', () => {
             ]
         })
 
-        render(<App />);
+        renderApp()
         expect(await screen.findByText('Luke')).toBeInTheDocument();
 
         const user = userEvent.setup();
-        const searchBtn = screen.getByRole('button', {name: /search/i});
+        const searchBtn = screen.getByRole('button', { name: /search/i });
         await user.click(searchBtn);
 
         expect(globalThis.fetch).toHaveBeenCalledTimes(1);

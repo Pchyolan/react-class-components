@@ -1,8 +1,15 @@
 import { useEffect, useState } from 'react'
+import { Link, Route, Routes } from 'react-router-dom'
+
 import Search from './Search'
 import Results from './Results'
 import ErrorBoundary from './ErrorBoundary'
+
 import { useLocalStorage } from './hooks/useLocalStorage'
+
+import AboutPage from './pages/AboutPage'
+import NotFoundPage from './pages/NotFoundPage'
+
 import './App.css'
 
 type Person = {
@@ -102,26 +109,42 @@ function App() {
       <header className="app-header">
         <p className="app-kicker">A long time ago in a galaxy far, far away...</p>
         <h1>Star Wars Characters</h1>
+        <nav>
+          <Link to="/"> Home </Link>
+          <Link to="/about"> About </Link>
+        </nav>
       </header>
 
-      <section className='search-section'>
-        <Search
-          search={search}
-          onSearchChange={handleSearchChange}
-          onSearch={handleSearch}
-        />
-      </section>
+      <Routes>
+        <Route
+          path='/'
+          element={
+            <>
+              <section className='search-section'>
+                <Search
+                  search={search}
+                  onSearchChange={handleSearchChange}
+                  onSearch={handleSearch}
+                />
+              </section>
 
-      <section className='results-section'>
-        <ErrorBoundary>
-          <Results
-            characters={characters}
-            onDelete={deleteCharacter}
-            loading={loading}
-            error={error}
-          />
-        </ErrorBoundary>
-      </section>
+              <section className='results-section'>
+                <ErrorBoundary>
+                  <Results
+                    characters={characters}
+                    onDelete={deleteCharacter}
+                    loading={loading}
+                    error={error}
+                  />
+                </ErrorBoundary>
+              </section>
+            </>
+          }
+        />
+        <Route path='/about' element={<AboutPage />} />
+        <Route path='*' element={<NotFoundPage />} />
+      </Routes>
+
 
     </main>
   )
