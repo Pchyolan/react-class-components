@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import Search from './Search'
 import Results from './Results'
 import ErrorBoundary from './ErrorBoundary'
+import { useLocalStorage } from './hooks/useLocalStorage'
 import './App.css'
 
 type Person = {
@@ -12,54 +13,47 @@ type Person = {
   height: string
 }
 
+const fetchCharacters = async (searchValue: string): Promise<Person[]> => {
+  const trimmedSearch = searchValue.trim()
+  const url = trimmedSearch
+    ? `https://swapi.online/api/people?search=${trimmedSearch}`
+    : 'https://swapi.online/api/characters';
+
+  const response = await fetch(url)
+
+  if (!response.ok) {
+    throw new Error('Failed to load characters')
+  }
+
+  return response.json()
+}
+
 function App() {
 
+  const { getValue, setValue } = useLocalStorage('search');
+  const [initialSearch] = useState(() => getValue() ?? '');
 
   const [characters, setCharacters] = useState<Person[]>([]);
-  const [search, setSearch] = useState('');
-  const [lastSearch, setLastSearch] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [search, setSearch] = useState(initialSearch);
+  const [lastSearch, setLastSearch] = useState(initialSearch);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    const savedSearch = localStorage.getItem('search')
+    fetchCharacters(initialSearch)
+      .then((data) => {
+        setCharacters(data);
+        setError(null);
+      })
+      .catch(() => {
+        setCharacters([]);
+        setError('Failed to load characters')
+      })
+      .finally(() => {
+        setLoading(false)
+      })
+  }, [initialSearch])
 
-    if (savedSearch) {
-      setSearch(savedSearch)
-      setLastSearch(savedSearch)
-      loadCharacters(savedSearch)
-    } else {
-      loadCharacters('')
-    }
-  }, [])
-
-  const loadCharacters = async (searchValue: string) => {
-    try {
-      setLoading(true)
-      setError(null)
-
-      const trimmedSearch = searchValue.trim()
-
-      const url = trimmedSearch
-        ? `https://swapi.online/api/people?search=${trimmedSearch}` : 'https://swapi.online/api/characters'
-      const response = await fetch(url)
-
-      if (!response.ok) {
-        throw new Error('Failed to load characters')
-      }
-
-      const data: Person[] = await response.json()
-
-      setCharacters(data)
-      setLoading(false)
-      setError(null)
-
-    } catch {
-      setCharacters([])
-      setLoading(false)
-      setError('Failed to load characters')
-    }
-  }
 
   const handleSearchChange = (value: string) => {
     setSearch(value)
@@ -72,12 +66,27 @@ function App() {
       return
     }
 
-    localStorage.setItem('search', trimmedSearch)
+    setValue(trimmedSearch);
 
 
     setSearch(trimmedSearch)
     setLastSearch(trimmedSearch)
-    loadCharacters(trimmedSearch)
+
+    setLoading(true)
+    setError(null)
+
+    fetchCharacters(trimmedSearch)
+      .then((data) => {
+        setCharacters(data);
+        setError(null);
+      })
+      .catch(() => {
+        setCharacters([]);
+        setError('Failed to load characters')
+      })
+      .finally(() => {
+        setLoading(false)
+      })
 
   }
 
