@@ -132,7 +132,7 @@ describe('App', () => {
         expect(await screen.findByText('Vader')).toBeInTheDocument();
 
         expect(globalThis.fetch).toHaveBeenCalledTimes(2);
-        expect(globalThis.fetch).toHaveBeenLastCalledWith('https://swapi.online/api/people?search=Vader')
+        expect(globalThis.fetch).toHaveBeenLastCalledWith('https://swapi.online/api/people?search=Vader&page=1')
     });
 
     it('saves search value to localStorage and renders search results', async () => {
@@ -197,7 +197,7 @@ describe('App', () => {
         renderApp()
 
         expect(screen.getByDisplayValue('Vader')).toBeInTheDocument();
-        expect(globalThis.fetch).toHaveBeenCalledWith('https://swapi.online/api/people?search=Vader')
+        expect(globalThis.fetch).toHaveBeenCalledWith('https://swapi.online/api/people?search=Vader&page=1')
         expect(await screen.findByText('Vader')).toBeInTheDocument();
 
     });

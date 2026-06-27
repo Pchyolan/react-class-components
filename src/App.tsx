@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link, Route, Routes } from 'react-router-dom'
+import { Link, Route, Routes, useSearchParams } from 'react-router-dom'
 
 import Search from './Search'
 import Results from './Results'
@@ -20,11 +20,11 @@ type Person = {
   height: string
 }
 
-const fetchCharacters = async (searchValue: string): Promise<Person[]> => {
+const fetchCharacters = async (searchValue: string, page: number): Promise<Person[]> => {
   const trimmedSearch = searchValue.trim()
   const url = trimmedSearch
-    ? `https://swapi.online/api/people?search=${trimmedSearch}`
-    : 'https://swapi.online/api/characters';
+    ? `https://swapi.online/api/people?search=${trimmedSearch}&page=${page}`
+    : `https://swapi.online/api/characters?page=${page}`;
 
   const response = await fetch(url)
 
@@ -39,6 +39,10 @@ function App() {
 
   const { getValue, setValue } = useLocalStorage('search');
   const [initialSearch] = useState(() => getValue() ?? '');
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const pageFromUrl = searchParams.get('page');
+  const currentPage = Number(pageFromUrl ?? 1);
 
   const [characters, setCharacters] = useState<Person[]>([]);
   const [search, setSearch] = useState(initialSearch);
@@ -47,7 +51,7 @@ function App() {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    fetchCharacters(initialSearch)
+    fetchCharacters(lastSearch, currentPage)
       .then((data) => {
         setCharacters(data);
         setError(null);
@@ -59,7 +63,7 @@ function App() {
       .finally(() => {
         setLoading(false)
       })
-  }, [initialSearch])
+  }, [lastSearch, currentPage])
 
 
   const handleSearchChange = (value: string) => {
@@ -82,19 +86,33 @@ function App() {
     setLoading(true)
     setError(null)
 
-    fetchCharacters(trimmedSearch)
-      .then((data) => {
-        setCharacters(data);
-        setError(null);
-      })
-      .catch(() => {
-        setCharacters([]);
-        setError('Failed to load characters')
-      })
-      .finally(() => {
-        setLoading(false)
-      })
+    const newSearchParams = new URLSearchParams(searchParams)
+    newSearchParams.set('page', '1')
+    setSearchParams(newSearchParams)
+  }
 
+  const handleNextPage = () => {
+    const nextPage = currentPage + 1;
+    const newSearchParams = new URLSearchParams(searchParams)
+    newSearchParams.set('page', String(nextPage))
+
+    setLoading(true);
+    setError(null)
+
+    setSearchParams(newSearchParams)
+  }
+
+  const handlePreviousPage = () => {
+    const previousPage = (currentPage - 1) <= 0
+      ? 1
+      : currentPage - 1;
+
+    setLoading(true);
+    setError(null)
+
+    const newSearchParams = new URLSearchParams(searchParams);
+    newSearchParams.set('page', String(previousPage));
+    setSearchParams(newSearchParams);
   }
 
   const deleteCharacter = (id: number) => {
@@ -121,6 +139,13 @@ function App() {
           element={
             <>
               <section className='search-section'>
+                <button type='button' onClick={handlePreviousPage}>
+                  Previous Page
+                </button>
+                <p className='search-page'> Current page: {currentPage} </p>
+                <button type='button' onClick={handleNextPage}>
+                  Next Page
+                </button>
                 <Search
                   search={search}
                   onSearchChange={handleSearchChange}
