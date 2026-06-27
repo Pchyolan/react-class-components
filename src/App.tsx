@@ -4,6 +4,7 @@ import { Link, Route, Routes, useSearchParams } from 'react-router-dom'
 import Search from './Search'
 import Results from './Results'
 import ErrorBoundary from './ErrorBoundary'
+import Pagination from './Pagination'
 
 import { useLocalStorage } from './hooks/useLocalStorage'
 
@@ -138,32 +139,30 @@ function App() {
           path='/'
           element={
             <>
-              <section className='search-section'>
-                <button type='button' onClick={handlePreviousPage}>
-                  Previous Page
-                </button>
-                <p className='search-page'> Current page: {currentPage} </p>
-                <button type='button' onClick={handleNextPage}>
-                  Next Page
-                </button>
-                <Search
-                  search={search}
-                  onSearchChange={handleSearchChange}
-                  onSearch={handleSearch}
+            <section>
+              <Pagination
+                currentPage={currentPage}
+                onNextPage={handleNextPage}
+                onPreviousPage={handlePreviousPage} 
                 />
-              </section>
+              <Search
+                search={search}
+                onSearchChange={handleSearchChange}
+                onSearch={handleSearch}
+              />
+            </section>
 
-              <section className='results-section'>
-                <ErrorBoundary>
-                  <Results
-                    characters={characters}
-                    onDelete={deleteCharacter}
-                    loading={loading}
-                    error={error}
-                  />
-                </ErrorBoundary>
-              </section>
-            </>
+          <section className='results-section'>
+            <ErrorBoundary>
+              <Results
+                characters={characters}
+                onDelete={deleteCharacter}
+                loading={loading}
+                error={error}
+              />
+            </ErrorBoundary>
+          </section>
+        </>
           }
         />
         <Route path='/about' element={<AboutPage />} />
