@@ -2,13 +2,7 @@ import { useState } from 'react'
 import Card from './Card'
 import './Results.css'
 
-type Person = {
-    id: number
-    name: string
-    gender: string
-    birth_year: string
-    height: string
-}
+import type { Person } from './types'
 
 type ResultsProps = {
     characters: Person[]

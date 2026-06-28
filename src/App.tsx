@@ -1,10 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, Route, Routes, useSearchParams } from 'react-router-dom'
 
-import Search from './Search'
-import Results from './Results'
-import ErrorBoundary from './ErrorBoundary'
-import Pagination from './Pagination'
+import MainPage from './MainPage'
 
 import { useLocalStorage } from './hooks/useLocalStorage'
 
@@ -12,15 +9,11 @@ import AboutPage from './pages/AboutPage'
 import NotFoundPage from './pages/NotFoundPage'
 import DetailsPage from './pages/DetailsPage'
 
+import type { Person } from './types'
+
 import './App.css'
 
-type Person = {
-  id: number
-  name: string
-  gender: string
-  birth_year: string
-  height: string
-}
+
 
 const fetchCharacters = async (searchValue: string, page: number): Promise<Person[]> => {
   const trimmedSearch = searchValue.trim()
@@ -138,41 +131,29 @@ function App() {
       <Routes>
         <Route
           path='/'
-          element={
-            <>
-            <section>
-              <Pagination
-                currentPage={currentPage}
-                onNextPage={handleNextPage}
-                onPreviousPage={handlePreviousPage} 
-                />
-              <Search
-                search={search}
-                onSearchChange={handleSearchChange}
-                onSearch={handleSearch}
-              />
-            </section>
-
-          <section className='results-section'>
-            <ErrorBoundary>
-              <Results
-                characters={characters}
-                onDelete={deleteCharacter}
-                loading={loading}
-                error={error}
-              />
-            </ErrorBoundary>
-          </section>
-        </>
+          element={<MainPage
+            currentPage={currentPage}
+            onNextPage={handleNextPage}
+            onPreviousPage={handlePreviousPage}
+            search={search}
+            onSearch={handleSearch}
+            onSearchChange={handleSearchChange}
+            characters={characters}
+            onDelete={deleteCharacter}
+            loading={loading}
+            error={error}
+          />
           }
-        />
-        <Route path='/details/:id' element={<DetailsPage />} />
+        >
+          <Route path='details/:id' element={<DetailsPage />} />
+        </Route>
+
         <Route path='/about' element={<AboutPage />} />
         <Route path='*' element={<NotFoundPage />} />
       </Routes>
 
 
-    </main>
+    </main >
   )
 }
 
