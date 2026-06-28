@@ -1,5 +1,5 @@
 import './Card.css'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 
 type CardProps = {
     id: number
@@ -9,11 +9,13 @@ type CardProps = {
 }
 
 function Card({ id, name, description, onDelete }: CardProps) {
+    const location = useLocation();
+
     return (
         <article className="character-card">
             <h2>{name}</h2>
             <p>{description}</p>
-            <Link to={`/details/${id}`}>
+            <Link to={`/details/${id}${location.search}`}>
                 Details
             </Link>
             <button

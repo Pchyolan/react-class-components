@@ -1,9 +1,10 @@
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import type { Person } from '../types'
 
 function DetailsPage() {
     const { id } = useParams();
+    const location = useLocation();
 
     const [character, setCharacter] = useState<Person | null>(null);
     const [loading, setLoading] = useState(true);
@@ -46,7 +47,7 @@ function DetailsPage() {
 
     return (
         <article className="details-card">
-            <Link to="/" className="details-close-link">
+            <Link to={`/${location.search}`} className="details-close-link">
                 Close
             </Link>
 
