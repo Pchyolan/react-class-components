@@ -1,6 +1,7 @@
 import { cleanup, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { MemoryRouter } from 'react-router-dom';
 import Results from './Results';
 
 afterEach(() => {
@@ -28,22 +29,36 @@ describe('Results', () => {
     }
 
     it('render loading message', () => {
-        render(<Results {...resultsProps} loading={true} />);
+        render(
+        <MemoryRouter>
+            <Results {...resultsProps} loading={true} />
+        </MemoryRouter>
+    );
         expect(screen.getByText(/loading/i)).toBeInTheDocument();
     });
 
     it('render error message', () => {
-        render(<Results {...resultsProps} error='Something is wrong' />);
+        render(
+            <MemoryRouter>
+                <Results {...resultsProps} error='Something is wrong' />
+        </MemoryRouter>
+    );
         expect(screen.getByText('Something is wrong')).toBeInTheDocument();
     });
 
     it('render no resuts', () => {
-        render(<Results {...resultsProps} characters={[]} />);
+        render(<MemoryRouter>
+            <Results {...resultsProps} characters={[]} />
+        </MemoryRouter>
+    );
         expect(screen.getByText(/no results/i)).toBeInTheDocument();
     });
 
     it('render characters cards', () => {
-        render(<Results {...resultsProps} />);
+        render(<MemoryRouter>
+            <Results {...resultsProps} />
+        </MemoryRouter>
+    );
         expect(screen.getByText('Luke')).toBeInTheDocument();
         expect(screen.getByText('Vader')).toBeInTheDocument();
 
@@ -55,7 +70,10 @@ describe('Results', () => {
         const user = userEvent.setup();
         const onDelete = vi.fn();
 
-        render(<Results {...resultsProps} onDelete={onDelete} />);
+        render(<MemoryRouter>
+            <Results {...resultsProps} onDelete={onDelete} />
+        </MemoryRouter>
+    );
 
         const deleteButtons = screen.getAllByRole('button', { name: /delete/i })
 
@@ -65,7 +83,11 @@ describe('Results', () => {
     });
 
     it('render error button', () => {
-        render(<Results {...resultsProps} />);
+        render(
+        <MemoryRouter>
+            <Results {...resultsProps} />
+        </MemoryRouter>
+    );
         expect(screen.getByRole('button', {name: /throw error/i})).toBeInTheDocument();
     });
 });

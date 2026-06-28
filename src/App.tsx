@@ -10,6 +10,7 @@ import { useLocalStorage } from './hooks/useLocalStorage'
 
 import AboutPage from './pages/AboutPage'
 import NotFoundPage from './pages/NotFoundPage'
+import DetailsPage from './pages/DetailsPage'
 
 import './App.css'
 
@@ -165,6 +166,7 @@ function App() {
         </>
           }
         />
+        <Route path='/details/:id' element={<DetailsPage />} />
         <Route path='/about' element={<AboutPage />} />
         <Route path='*' element={<NotFoundPage />} />
       </Routes>
