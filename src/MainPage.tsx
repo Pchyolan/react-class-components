@@ -4,6 +4,7 @@ import Pagination from "./Pagination";
 import Search from "./Search";
 import Results from "./Results";
 import ErrorBoundary from "./ErrorBoundary";
+import SelectedItemFlyout from "./SelectedItemsFlyout"
 
 import { useOutlet } from "react-router-dom";
 
@@ -59,6 +60,8 @@ function MainPage({ currentPage, onNextPage, onPreviousPage, search, onSearch, o
                     </section>
                 )}
             </div>
+
+            <SelectedItemFlyout />
         </>
     )
 }

@@ -1,0 +1,18 @@
+.selected-items-flyout {
+    position: sticky;
+    bottom: 16px;
+    z-index: 10;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+
+    margin-top: 24px;
+    padding: 16px 20px;
+
+    border: 1px solid rgba(147, 197, 253, 0.5);
+    border-radius: 16px;
+    background: rgba(15, 23, 42, 0.95);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+}
