@@ -58,8 +58,7 @@ function Results({ characters, onDelete, loading, error }: ResultsProps) {
                     return (
                         <Card
                             key={person.id}
-                            id={person.id}
-                            name={person.name}
+                            person={person}
                             description={description}
                             onDelete={onDelete}
                         />

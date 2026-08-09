@@ -1,26 +1,56 @@
 import './Card.css'
-import { Link, useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
+import type { Person } from './types';
+import { useSelectedItemsStore } from './store/selectedItemStore';
+import { type MouseEvent } from 'react';
+
 
 type CardProps = {
-    id: number
-    name: string
+    person: Person
     description: string
     onDelete: (id: number) => void
 }
 
-function Card({ id, name, description, onDelete }: CardProps) {
+function Card({ person, description, onDelete }: CardProps) {
     const location = useLocation();
+    const navigate = useNavigate();
+
+    const toggleItem = useSelectedItemsStore((state) => state.toggleItem);
+    const isSelected = useSelectedItemsStore((state) => state.isSelected(person.id));
+
+    const handleCardClick = () => {
+        navigate(`/details/${person.id}${location.search}`)
+    }
+
+    const handleCheckboxClick = (event: MouseEvent<HTMLInputElement>) => {
+        event.stopPropagation();
+    }
+
+    const handleDeleteClick = (event: MouseEvent<HTMLButtonElement>) => {
+        event.stopPropagation();
+        onDelete(person.id)
+    }
+
+    const cardClassName = isSelected ? 'character-card selected' : 'character-card';
 
     return (
-        <article className="character-card">
-            <h2>{name}</h2>
+        <article
+            className={cardClassName}
+            onClick={handleCardClick}
+        >
+            <div className='card-title'>
+                <input type='checkbox'
+                    onChange={() => toggleItem(person)}
+                    checked={isSelected}
+                    onClick={handleCheckboxClick}
+                />
+                <h2>{person.name}</h2>
+            </div>
             <p>{description}</p>
-            <Link to={`/details/${id}${location.search}`}>
-                Details
-            </Link>
             <button
+                type='button'
                 className="secondary-button"
-                onClick={() => onDelete(id)}>
+                onClick={handleDeleteClick}>
                 Delete
             </button>
         </article>

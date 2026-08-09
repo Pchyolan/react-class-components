@@ -11,8 +11,13 @@ afterEach(() => {
 describe('Card', () => {
 
     const cardProps = {
-        id: 1,
-        name: 'Luke Skywalker',
+        person: {
+            id: 1,
+            name: 'Luke',
+            gender: 'male',
+            birth_year: '1BY0',
+            height: '171'
+        },
         description: 'Jedi from Tatooine',
         onDelete: vi.fn(),
     }
@@ -22,7 +27,7 @@ describe('Card', () => {
             <Card {...cardProps} />
         </MemoryRouter>
         );
-        expect(screen.getByText(cardProps.name)).toBeInTheDocument();
+        expect(screen.getByText(cardProps.person.name)).toBeInTheDocument();
         expect(screen.getByText(cardProps.description)).toBeInTheDocument();
     })
 
@@ -37,7 +42,7 @@ describe('Card', () => {
         await user.click(screen.getByRole('button', { name: /delete/i }));
 
         expect(onDelete).toHaveBeenCalledTimes(1);
-        expect(onDelete).toHaveBeenCalledWith(cardProps.id);
+        expect(onDelete).toHaveBeenCalledWith(cardProps.person.id);
     });
 
     it('render details link', () => {
@@ -46,6 +51,6 @@ describe('Card', () => {
         </MemoryRouter>
         );
 
-        expect(screen.getByRole('link', {name: /details/i})).toHaveAttribute('href', '/details/1')
+        expect(screen.getByRole('link', { name: /details/i })).toHaveAttribute('href', '/details/1')
     })
 });
